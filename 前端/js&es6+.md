@@ -84,6 +84,12 @@
     - this 取决于第一个参数
     - 如果第一个参数为空，那么就是 window
 
+> apply、call、bind
+
+- apply、call和bind都可以设置this的值，第一个参数都是绑定this
+- apply第二个参数是传数组；call第二个参数是以逗号分割的参数。
+- apply和call都是立即执行函数。bind新生成新的函数，想什么时候调用就什么时候调用
+
 > == vs ===
 
 - == 
@@ -445,6 +451,7 @@
     - 同步代码，直接执行
     - 异步函数先放在异步队列中
     - 待同步函数执行完毕，轮询执行异步队列的函数
+    - 异步队列中先执行微任务后执行宏任务
 - 实例分析
     ```javascript
         setTimeout(function () {
@@ -512,6 +519,24 @@
                                         console.log('a')
 
                                         不知道ajax加载和100ms快，所以不确定ajax先执行还是100ms快
+        */
+    ```
+    ```javascript
+        console.log(0);
+        setTimeout(function () {
+            console.log(1);
+        });
+
+        new Promise(function(resolve,reject){
+            resolve(3);
+            console.log(2)
+        }).then(function(val){
+            console.log(val);
+        })
+        /*
+            // 主进程                   // 异步队列
+            console.log(0);            // 微任务                // 宏任务
+            console.log(2)             console.log(val);       console.log(1);
         */
     ```
 

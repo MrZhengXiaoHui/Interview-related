@@ -262,6 +262,10 @@
 - 任意组件
     - 这种方式可以通过 Vuex 或者 Event Bus 解决
 
+> vue中组件的data为什么是一个函数
+
+- 组件中的data写成一个函数，数据以函数返回值形式定义，这样每复用一次组件，就会返回一份新的data，类似于给每个组件实例创建一个私有的数据空间，让各个组件实例维护各自的数据。而单纯的写成对象形式，就使得所有组件实例共用了一份data，就会造成一个变了全都会变的结果。
+
 > extend 能做什么
 
 - 作用是扩展组件生成一个构造器，通常会与 $mount 一起使用。
@@ -294,6 +298,11 @@
         })
     ```
 - mixins 应该是我们最常使用的扩展组件的方式了。如果多个组件中有相同的业务逻辑，就可以将这些逻辑剥离出来，通过 mixins 混入代码，比如上拉下拉加载数据这种逻辑等等
+
+> 怎么封装好的vue组件
+
+- 使用extend构造vue组件
+- 用mixins把相同逻辑提出来
 
 > computed 和 watch 区别
 
@@ -571,6 +580,13 @@
     - 生成的vnode和prevVnode，通过patch进行对比
     - 渲染到html
 
+> vuex工作流程
+
+- 在vue组件里面，通过dispatch来触发actions提交修改数据的操作。
+- 然后再通过actions的commit来触发mutations来修改数据。
+- mutations接收到commit的请求，就会自动通过Mutate来修改state（数据中心里面的数据状态）里面的数据。
+- 最后由store触发每一个调用它的组件的更新
+
 ## react 
 
 > react 的生命周期
@@ -578,6 +594,8 @@
 - 生命周期函数指在某一个时刻组件会自动调用执行的函数
 - 组件初始化 initialization
     - 设置 props和state
+    - getDefaultProps:获取实例的默认属性
+    - getInitialState:获取每个实例的初始化状态
 - 组件的挂载 Mounting
     - componentWillMount
         - 在组件即将被挂载到页面的时刻自动执行
@@ -622,6 +640,17 @@
 - setState是异步的
 - 可以通过第二个参数通过回调函数处理后面的逻辑
 
+> 怎么让setState变成同步
+
+- 在外层包裹setTimeout
+    ```javascript
+        setTimeout(()=>{
+            this.setState({val: this.state.val + 1});
+            
+            this.setState({val: this.state.val + 1});
+        },0)
+    ```
+
 > 通信
 
 - 父子组件通信
@@ -659,6 +688,24 @@
         ```
 - 任意组件
     - 这种方式可以通过 Redux 或者 Event Bus 解决
+
+> redux工作流程
+
+- 在react中，组件连接到redux，如果要访问redux，需要派出一个包含type和负载(paylod)的action(json对象)。action中的paylod是可选的，action将其转发给reducer。
+- 当reducer收到action时，通过swith...case语法比较action中type。匹配时，更新对应的内容返回新的state
+- 当redux状态更改时，连接到redux的组件将接收新的状态作为props。当组件接收到这些props时，它将进入更新阶段并重新渲染ui
+
+> 为什么reducer返回的是新的state
+
+- 因为比较两个JavaScript对象所有属性是否相同的唯一方法是对它进行深比较
+- 但深比较在真实的应用当中代价昂贵，因为通常js的对象都很大，同时需要比较的次数很多
+- 因此一个有效的解决方法是作出一个规定：无论何时发生变化时，开发者都要创建一个新的对象，然后将新对象传递出去。同时，当没有任何变化发生时，开发者发送回旧的对象。也就是说，新的对象代表新的state
+
+> redux的三大原则
+
+- state以单一对象存储在store对象中
+- state只读（每次都返回一个新的对象）
+- 使用纯函数reducer执行state更新
 
 > HOC 是什么？
 
@@ -837,7 +884,7 @@
     - 国内使用，首推vue。文档更易读、易学、社区够大
     - 如果团队水平较高，推荐使用react。组件化和JSX
 
-## vue和react对比
+## 公共知识点
 
 > 路由
 
