@@ -304,6 +304,62 @@
 - 使用extend构造vue组件
 - 用mixins把相同逻辑提出来
 
+> vue不常用但好用的api
+
+- filter过滤器，用于一些常见的文本格式化
+    ```html
+        <!-- 在双花括号中 -->
+        {{ message | capitalize }}
+
+        <!-- 在 `v-bind` 中 -->
+        <div v-bind:id="rawId | formatId"></div>
+    ```
+    ```js
+        // 局部组件
+        filters: {
+            capitalize: function (value) {
+                if (!value) return ''
+                value = value.toString()
+                return value.charAt(0).toUpperCase() + value.slice(1)
+            }
+        }
+        // 全局组件
+        Vue.filter('capitalize', function (value) {
+            if (!value) return ''
+            value = value.toString()
+            return value.charAt(0).toUpperCase() + value.slice(1)
+        })
+
+        new Vue({
+            // ...
+        })
+        // 当全局过滤器和局部过滤器重名时，会采用局部过滤器。
+    ```
+- mixin
+    ```js
+        // 多个组件可以共享数据和方法，在使用mixin的组件中引入后，mixin中的方法和属性也就并入到该组件中，可以直接使用。钩子函数会两个都被调用，mixin中的钩子首先执行。
+        // mixin.js
+        export default {
+            data() {
+                return {
+                name: 'mixin'
+            }
+            },
+            created() {
+                console.log('mixin...', this.name);
+            },
+            mounted() {},
+            methods: {}
+        }
+        // 组件
+        import '@/mixin'; // 引入mixin文件
+        export default {
+            mixins: [mixin]
+        }
+        // 当组件和混入对象含有同名选项时，这些选项将以恰当的方式进行“合并”。
+        // 比如，数据对象在内部会进行递归合并，并在发生冲突时以`组件数据优先`。
+    ```
+
 > computed 和 watch 区别
 
 - computed 是计算属性，依赖其他属性计算值，并且 computed 的值有缓存，只有当计算值变化才会返回内容。

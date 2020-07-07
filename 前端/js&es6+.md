@@ -343,6 +343,7 @@
         const j = 20;
         // j = 200  报错  常量不能再赋值
     ```
+    - const不可修改声明的基本类型的值，但是可以修改对象属性。因为const 引用类型： 地址不可变
 - 多行字符串/模板变量
     ```javascript
         let name = 'zhangsan', age = 20;
@@ -729,6 +730,34 @@
 - setTimeout、setInterval、requestAnimationFrame 
 
 ## 手写代码
+
+- 数组去重
+    ```js
+        function unique10(arr) {
+            //Set数据结构，它类似于数组，其成员的值都是唯一的
+            return Array.from(new Set(arr)); // 利用Array.from将Set结构转换成数组
+        }
+    ```
+
+- 回文字符串
+    ```js
+        // 方法一
+        function palindRome(str){
+            var len = str.length;
+            var str1 = "";
+            for(var i=len-1; i>=0;i--){
+                str1+=str[i];
+            }
+            console.log(str1 == str)
+        }
+        // 方法二
+        function Palindromes(str) {
+            let reg = /[\W_]/g; // \w 匹配所有字母和数字以及下划线； \W与之相反； [\W_] 表示匹配下划线或者所有非字母非数字中的任意一个；/g全局匹配
+            let newStr = str.replace(reg, '').toLowerCase();
+            let reverseStr = newStr.split('').reverse().join('')
+            return reverseStr === newStr; // 与 newStr 对比
+        }
+    ```
 
 - 实现一个深拷贝（简易版）
     ```javascript
