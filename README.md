@@ -69,7 +69,7 @@ typeof function // 'function'
 
 ### instanceof
 
-`instanceof`通过原型链的方式来判断是否为构建函数的实例，常用于判断具体的对象类型
+> `instanceof`通过原型链的方式来判断是否为构建函数的实例，常用于判断具体的对象类型
 
 ```javascript
 const Person = function() {}
@@ -85,7 +85,7 @@ str1 instanceof String // true
 
 ### Object.prototype.toString.call
 
-`Object.prototype.toString.call` 综合来看是最佳选择，能判断的类型最完整，基本上是开源库选择最多的方式
+> `Object.prototype.toString.call` 综合来看是最佳选择，能判断的类型最完整，基本上是开源库选择最多的方式
 
 ```javascript
 Object.prototype.toString.call(null) // '[object Null]'
@@ -108,11 +108,11 @@ isNaN('') // false
 
 ### 转Boolean
 
-在条件判断时，除了`undefined`、`null`、`false`、`NaN`、`''`、`0`、`-0`，其他所有值都转为`true`，包括所有对象
+> 在条件判断时，除了`undefined`、`null`、`false`、`NaN`、`''`、`0`、`-0`，其他所有值都转为`true`，包括所有对象
 
 ### 对象转原始类型
 
-对象在转类型的时候，会调用内置的`[[ToPrimitive]]`函数，对于该函数来说，算法逻辑一般来说如下：
+> 对象在转类型的时候，会调用内置的`[[ToPrimitive]]`函数，对于该函数来说，算法逻辑一般来说如下：
 
 - 如果已经是原始类型了，那就不需要转换了
 - 如果需要转字符串类型就调用`x.toString()`，转换为基础类型的话就返回转换的值。不是字符串类型的话就先调用`valueOf`，结果不是基础类型的话再调用`toString`
