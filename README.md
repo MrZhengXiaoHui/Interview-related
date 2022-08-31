@@ -203,3 +203,65 @@ a > 1 // true
 `===`：判断两者类型和值相同就行
 
 ## 题目：vue中组件之间的通信方式？
+
+- 父子组件
+  - `props`
+  - `$emit/$on`
+  - `$children/$parent` \$children获取组件内所有的子组件实例;\$parent获取父组件实例对象
+  - `$attrs/$listeners` \$attrs可以直接获取未在props定义的值。子组件需要调用父组件的方法可以通过\$listeners
+  - `ref` 通过在子组件标签定义ref属性，在父组件中可以使用$refs访问子组件实例
+- 兄弟组件
+  - `$parent`  能够访问父组件的属性和方法
+  - `eventBus` 将eventBus绑到vue的原型对象上，通过emit(触发)、on(监听)、off(移除)
+  - `vuex`
+- 跨层级关系
+  - `provide/inject` 依赖注入
+  - `$root` 能够访问根父组件的属性和方法
+  - `eventBus`
+  - `vuex`
+
+vue3移除了on、off、once实例方法
+vue3中移除了eventbus，但可以借助第三方工具来完成，Vue 官方推荐使用 mitt 或 tiny-emitter
+
+## 题目：v-if和v-for哪个优先级高？
+
+- 在vue2中，v-for优先于v-if被解析；在vue3中，v-if的优先级高于v-if
+- 通常有两种情况下导致我们这样做：
+  - 为了过滤列表中的项目(比如v-for="user in users" v-if="user.isActive")。
+    - 在vue2中可以正常执行，但是在vue3中会报错
+    - 解决方式可以定义一个计算属性，让其返回过滤后的列表即可
+  - 为了避免渲染本应该被隐藏的列表(比如v-for="user in users" v-if="shouldShowUsers")
+    - 在vue2中会先渲染一遍再隐藏，会消耗性能。在vue3中会先隐藏不循环
+    - 解决方式可以把v-if移动到容器元素上
+
+## 题目：简述 Vue 的生命周期以及每个阶段做的事
+
+- 每个vue组件实例被创建后都会经过一系列初始化步骤，比如，它需要数据观测，模版编译，挂载实例到dom上，以及数据变化时更新dom。这个过程中会运行叫做生命周期钩子的函数，以便用户在特定阶段有机会添加他们自己的代码。
+- vue生命周期总共可以分为8个阶段：创建前后，载入前后，更新前后，销毁前后，以及一些特殊场景的生命周期。vue3中新增了三个用于调试和服务端渲染的场景。
+
+生命周期v2 | 生命周期v3 | 描述 | 实践
+--- | :---: | :---: | :---:
+beforeCreate | setup | 组件实例被创建之初 | 通常用于插件开发中执行一些初始化任务
+create | setup | 组件实例已经完全创建 | 可以访问各种数据，获取接口数据等
+beforeMount | onBeforeMount | 组件挂载之前 |
+mounted | onMounted | 组件挂载到实例上去之后 | dom已创建，可用于获取访问数据和dom元素；访问子组件等
+beforeUpdate | onBeforeUpdate | 组件数据发生变化，更新之前 | 此时view层还未更新，可用于获取更新前各种状态
+updated | onUpdated | 组件数据更新之后 | 完成view层的更新，更新后，所有状态已是最新
+beforeDestroy | onBeforeUnMounted | 组件实例销毁之前 | 实例被销毁前调用，可用于一些定时器或订阅的取消
+destroyed | onUnmounted | 组件实例销毁之后 | 销毁一个实例。可清理它与其它实例的连接，解绑它的全部指令及事件监听器
+activated | onActivated | keep-alive 缓存的组件激活时调用 |
+deactivated | onDeactivated | keep-alive 缓存的组件停用时调用 |
+errorCaptured | onErrorCaptured | 在捕获一个来自后代组件的错误时被调用 |
+\- | onRenderTracked | 调试钩子，响应式依赖被收集时调用 |
+\- | onRenderTriggered | 调试钩子，响应式依赖被触发时调用 |
+serverPrefetch | onServerPrefetch | ssr only，组件实例在服务器上被渲染前调用
+
+- setup和created谁先执行？setup中为什么没有beforeCreate和created？
+  - setup最先执行，此时组件实例在setup内部已经创建，所以created的处理对于setup来讲明显在后面，对于开发者来说已经没有意义，所以setup中没必要再使用beforeCreate和created
+
+## 题目：能说说双向绑定以及它的实现原理吗？
+
+- vue中双向数据绑定是一个指令v-model，可以绑定一个动态值到视图，同时视同中变化能改变该值。v-model是语法糖，默认情况下相当于:value和@input。
+- 使用v-model可以减少大量繁琐的事件处理代码，提高开发效率，代码可读性也更好
+- 通常在表单项上使用v-model
+- 原生的表单项可以直接使用v-model，自定义组件上如果要使用它需要在组件内部绑定value并处理输入事件
