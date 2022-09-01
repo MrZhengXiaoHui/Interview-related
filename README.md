@@ -265,3 +265,64 @@ serverPrefetch | onServerPrefetch | ssr only，组件实例在服务器上被渲
 - 使用v-model可以减少大量繁琐的事件处理代码，提高开发效率，代码可读性也更好
 - 通常在表单项上使用v-model
 - 原生的表单项可以直接使用v-model，自定义组件上如果要使用它需要在组件内部绑定value并处理输入事件
+- 输出包含v-model模板的组件渲染函数，发现它会被转换为value属性的绑定以及一个事件监听，事件回调函数中会做相应变量更新操作
+
+### v-model和sync修饰符有什么区别
+
+- 相同点：都是语法糖，都可以实现父子组件中的数据的双向通信。
+- 区别：
+  - v-model 默认对应的是input或者textarea等组件的input事件，如果在子组件替换这个input事件，其本质和.sync修饰符一模一样
+  - 一个组件可以多个属性用.sync修饰符，可以同时"双向绑定多个“prop”，而并不像v-model那样，一个组件只能有一个。
+
+### 自定义组件使用v-model如果想要改变事件名或者属性名应该怎么做
+
+- 自定义model对象，对象.prop为属性名，对象.event为事件名
+
+## 题目：vue中如何扩展一个组件
+
+- 常见的组件扩展方法有：mixins、slots、extends等
+- 混入mixins是分发vue组件中可复用功能的非常灵活的方式。混入对象可以包含任意组件选项。当组件使用混入对象时，所有混入对象的选项将被混入该组件本身的选项。
+  - 场景：当我们存在多个组件中的数据或者功能很相近时，就可以使用mixins将公共部分提取出来，通过mixins封装的函数，组件调用他们是不会改变函数作用域外部的
+  - 冲突：
+    - 当组件选项与混入选项冲突时以组件优先
+    - 当组件和mixin同时定义生命周期选项,两个都会触发,而且mixin会先触发.
+    - 如果组件和mixin同时定义相同方法,会使用组件方法,会覆盖mixin.
+    - 如果组件和mixin同时定义相同计算属性,会使用组件方法,会覆盖mixin.
+  - 隐式依赖:
+    - mixin和使用它的组件之间没有层次关系。组件里的变量名称修改后，mixin里没改
+  - vue3中引入的composition API (类似于hook) 解决mixins的缺点
+    - 解决命名冲突
+    - 解决隐式依赖-必须将变量显式的传给函数
+
+## 题目：vue 返回上一页不刷新页面且滚动条位置不变
+
+1. 不刷新页面
+   - 设置路由：
+
+      ```javascript
+      {
+        path:'/home/my',
+        name:'my',
+        component: () => import('@/home/my'),
+        meta: { 
+          keepAlive: true // 需要缓存
+        }
+      }
+      ```
+
+   - 设置app.vue
+
+     ```html
+     <keep-alive>
+        <router-view v-if="$route.meta.keepAlive"></router-view>
+     </keep-alive>
+     <router-view v-else="!$route.meta.keepAlive"></router-view>
+     ```
+
+2. 滚动条不变
+   - 页面离开前存一下滚动条位置(dom.srcollTop)
+   - 页面返回时设置滚动条位置(使用nextTick，再获取dom，设置dom.srcollTop位置)
+
+## 题目：前端实现图片懒加载
+
+## 题目：前端处理长列表
