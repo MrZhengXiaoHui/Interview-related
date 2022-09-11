@@ -325,4 +325,57 @@ serverPrefetch | onServerPrefetch | ssr only，组件实例在服务器上被渲
 
 ## 题目：前端实现图片懒加载
 
+1. html实现
+   - 给img标签加上loading="lazy"
+2. js实现
+   - 拿到所有的图片dom，通过document.body.clientHeight获取可视化高度
+   - 再使用element.getBoundingClientRect得到元素相对浏览的top值，遍历每个图片判断当前图片是否到了可视区范围内
+   - 如果到了就设置图片的src属性
+   - 绑定window的scroll事件，对其进行事件监听。
+     - scroll 事件会在很短的时间内触发很多次，严重影响页面性能
+     - 需要一个节流函数来控制函数的多次触发，在一段时间内只执行一次回调
+   - 在页面初始化的时候，图片的src实际上是放在data-src属性上的，当元素处于可视化范围内的时候，就把data-src赋值给src属性，完成图片加载。
+3. IntersectionObserver 可以用来监听元素是否进入了设备的可视区域之内
+   - 先获取所有img带data-src的dom
+   - new IntersectionObserver传callback函数
+   - callback函数参数为数组
+     - 通过数组的对象isIntersecting判断元素是否可见
+     - 可见时，对象的target获取元素，再获取getAttribute("data-src")，再给dom设置setAttribute("src", 值)，最后通过unobserve移除监听
+   - 遍历所有img的dom进行监听observe
+
+      ```javascript
+      var images = document.getElementsByTagName("img");
+      function callback(entries) {
+        for (let i of entries) {
+          if (i.isIntersecting) {
+            let img = i.target;
+            let trueSrc = img.getAttribute("data-src");
+            img.setAttribute("src", trueSrc);
+            observer.unobserve(img);
+          }
+        } 
+      }
+      const observer = new IntersectionObserver(callback);
+      for (let i of images) {
+        observer.observe(i);
+      }
+      ```
+
 ## 题目：前端处理长列表
+
+1. 懒加载（上拉加载）
+   - 用数组保存所有的数据
+   - 根据一屏幕能渲染的数量大致算出一次性渲染的数量，分割源数组，splitArray方法，记录渲染了几组数据
+   - 列表后面跟着一个dom，监听滚动事件
+   - 当这个dom滚动到可视区域时，取出二维数组中数据来渲染
+2. 虚拟加载（可视区域渲染）
+   - 先定义一个外层容器div用于监听滚动事件
+   - 再包裹一个div设置所有数据的高度，撑开外层容器，用于显示滚动条
+   - 再包裹一个div展示内容时刻保持在屏幕中央可视化区域
+     - 计算当前可见区域起始数据的 startIndex
+       - document.body.scrollTop 除以 当前一个项的高度 再向下取整 得可见区域的起始数据索引
+     - 计算当前可见区域结束数据的 endIndex
+       - 起始位置索引加上可视化列表总数量
+       - startIndex + （document.body.clientHeight 除以 当前一个项的高度 再向上取整）得可见区域结束索引
+     - 计算当前可见区域的数据，并渲染到页面中
+       - 通过slice截取数组渲染可见区域对应的数据
